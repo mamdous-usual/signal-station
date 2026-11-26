@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signal Station</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+<header>
+  <h1>Signal <em>Station</em></h1>
+  <p>Generate waves, combine them, and see and hear what changes.</p>
+</header>
+<main>
+  <noscript>Signal Station needs JavaScript.</noscript>
+  <section class="panel instrument" aria-label="Oscilloscope">
+    <div class="screen">
+      <canvas id="scope" tabindex="0" role="img" aria-label="Waveform display. Left and right arrows move the measurement cursor."></canvas>
+      <span id="frozen-badge" hidden>FROZEN</span>
+    </div>
+    <div class="legend"><span class="ka">A</span><span class="kb">B</span><span class="ks">Sum (when combined)</span><span id="cursor"></span></div>
+    <div class="toolbar">
+      <button id="play" type="button" class="primary">▶ Play</button>
+      <label class="inline">Volume <input type="range" id="volume" min="0" max="0.5" step="0.01"> <output id="volume-out"></output></label>
+      <button id="sweep" type="button" title="Scroll the trace in slow motion">Slow sweep</button>
+      <button id="freeze" type="button" title="Hold the current trace (F)">Freeze</button>
+      <button id="single" type="button" title="Fit one period of A">Single cycle</button>
+      <label class="inline">Window <select id="window">
+        <option value="5">5 ms</option><option value="10">10 ms</option><option value="20">20 ms</option><option value="50">50 ms</option>
+        <option value="100">100 ms</option><option value="250">250 ms</option><option value="500">500 ms</option><option value="1000">1 s</option>
+      </select></label>
+      <label class="inline">Vertical <select id="scale"><option value="auto">Auto</option><option value="1.25">±1.25</option><option value="2.5">±2.5</option></select></label>
+      <button id="copy" type="button">Copy settings</button>
+      <button id="export" type="button">Save PNG</button>
+      <button id="reset" type="button" title="Restore defaults (R)">Reset</button>
+    </div>
+    <p id="message" role="status"></p>
+    <dl id="readouts"></dl>
+  </section>
+
+  <div class="grid">
+    <section class="panel osc-a"><h2>Oscillator A</h2><div id="osc-a"></div></section>
+    <section class="panel osc-b"><h2>Oscillator B</h2>
+      <label class="switch"><input type="checkbox" id="b-on"> Add B to the signal</label><div id="osc-b"></div></section>
+    <section class="panel"><h2>White noise</h2>
+      <label class="switch"><input type="checkbox" id="noise-on"> Add noise</label>
+      <div class="param"><label for="noise-level">Level</label><output id="noise-out"></output>
+        <input type="range" id="noise-level" min="0" max="0.5" step="0.01"></div>
+      <p class="hint">The drawn noise is representative. It is not a sample-for-sample copy of what you hear.</p>
+      <p class="hint">Keys: Space play/stop · F freeze · R reset (when no control is focused).</p>
+    </section>
+  </div>
+
+  <section class="panel"><h2>Experiments</h2><div id="presets" class="toolbar"></div><p id="preset-note" role="status"></p></section>
+
+  <section class="panel" id="sampling">
+    <h2>Sampling and aliasing <span class="tag">Illustrative · visual only · no audio</span></h2>
+    <p>A one-second view of an ideal sine (solid), instantaneous samples (dots), and the lowest-frequency sine through those same samples (dashed). Real converters also use filters, which this does not model.</p>
+    <canvas aria-label="Sampling demonstration" role="img"></canvas>
+    <div class="two">
+      <div class="param"><label for="sig-f">Signal frequency</label><output id="sig-f-out"></output><input type="range" id="sig-f" min="1" max="30" value="3"></div>
+      <div class="param"><label for="sig-fs">Sampling rate</label><output id="sig-fs-out"></output><input type="range" id="sig-fs" min="4" max="64" value="20"></div>
+    </div>
+    <p id="sampling-result" role="status"></p>
+  </section>
+
+  <section class="panel reference"><h2>Signal concepts</h2>
+    <details open><summary>Frequency, period, amplitude, phase</summary>
+      <p><b>Frequency</b> <i>f</i> is cycles per second (Hz). <b>Period</b> <i>T</i> is seconds per cycle. <b>Amplitude</b> <i>A</i> is the peak size. <b>Phase</b> <i>φ</i> is where in its cycle the wave starts.</p>
+      <p class="formula">T = 1 / f &nbsp;&nbsp;&nbsp; x(t) = A · sin(2πft + φ)</p>
+      <p><i>t</i> is time in seconds. At 100 Hz, T is 10 ms.</p></details>
+    <details><summary>Waveform shapes</summary>
+      <p><b>Sine:</b> a single frequency; the building block of the others. <b>Square:</b> odd harmonics at 1/n strength; digital clocks, chiptunes. <b>Triangle:</b> odd harmonics at 1/n²; softer, used in synthesisers. <b>Sawtooth:</b> all harmonics at 1/n; bright synth tones, timing ramps.</p>
+      <p>The display draws ideal shapes. Audio is band-limited, so sharp edges have slight ripples.</p></details>
+    <details><summary>Interference and beats</summary>
+      <p>Signals add point by point. In phase they reinforce; 180° apart with equal frequency and amplitude they cancel. Two close frequencies drift in and out of step:</p>
+      <p class="formula">f<sub>beat</sub> = |f₁ − f₂|</p></details>
+    <details><summary>Sampling and aliasing</summary>
+      <p>Sampling measures a signal f<sub>s</sub> times per second. To capture it unambiguously, f<sub>s</sub> must exceed twice its highest frequency. Otherwise it appears as a lower alias:</p>
+      <p class="formula">f<sub>alias</sub> = |f − f<sub>s</sub> · round(f / f<sub>s</sub>)|</p></details>
+  </section>
+</main>
+</body>
+</html>
